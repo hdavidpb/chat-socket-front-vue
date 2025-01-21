@@ -5,6 +5,7 @@ import { ref,watch } from "vue";
 interface IDataMessage {
   message: string;
   nickname: string;
+  color?:string;
   id: string;
 }
 const BACKEND_URL = import.meta.env.VITE_BACKEND_ULR;
@@ -14,6 +15,7 @@ const messageEmit = ref("");
 const messages = ref<IDataMessage[]>([]);
 
 const nickname = ref(localStorage.getItem("nickname") || "" );
+const color = ref(localStorage.getItem("color") || "#FF0000");
 const userId = ref<string>("");
 
 const containerMsgRef = ref<HTMLDivElement | null>(null);
@@ -38,6 +40,7 @@ const handleEmit = () => {
   socket.emit("message", {
     message: messageEmit.value,
     nickname: nickname.value,
+    color: color.value,
     id: socket.id,
   });
   messageEmit.value = "";
@@ -45,6 +48,10 @@ const handleEmit = () => {
 watch(nickname, (newVal) => {
   localStorage.setItem("nickname", newVal);
 });
+watch(color, (newVal) => {
+  localStorage.setItem("color", newVal);
+});
+
 
 </script>
 
@@ -62,24 +69,29 @@ watch(nickname, (newVal) => {
           v-for="data in messages"
           :key="data.message"
         >
-          <span :class="['text-lg font-semibold',{'text-right':nickname.toLowerCase() === data.nickname.toLowerCase()}]">{{ data.nickname }}</span>
+          <span :style="`color: ${data.color ?? '#000000'}`" :class="['text-lg font-semibold',{'text-right':nickname.toLowerCase() === data.nickname.toLowerCase()}]">{{ data.nickname }}</span>
           <span class="p-3 bg-white rounded-lg">{{ data.message }}</span>
         </div>
       </section>
+     <div class="w-full flex justify-start items-center gap-2 p-2">
       <input
         placeholder="Escribe tu nickname"
-        class="w-full border h-8 px-3 outline-none"
+        class="flex-1 border h-9 px-3 outline-none rounded-lg"
         v-model="nickname"
+        :style= " `color: ${color}`"
       />
+      <input type="color" v-model="color" class="w-10 h-10 rounded-full outline-none"/>
+     </div>
       <form
         @submit.prevent="handleEmit"
-        class="w-full h-[70px] bg-white flex gap-3"
+        class="w-full h-[50px] bg-white flex gap-3 "
       >
         <input
           :disabled="!nickname.trim()"
           autofocus
           v-model="messageEmit"
           class="flex-1 h-full p-2 outline-none disabled:bg-gray-200"
+          placeholder="Escribe tu mensaje..."
         />
         <button
           :disabled="!nickname.trim() || !messageEmit.trim() "
