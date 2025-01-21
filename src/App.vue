@@ -7,7 +7,9 @@ interface IDataMessage {
   nickname: string;
   id: string;
 }
-const socket = io("http://localhost:3000/");
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_ULR;
+const socket = io(BACKEND_URL);
 
 const messageEmit = ref("");
 const messages = ref<IDataMessage[]>([]);
