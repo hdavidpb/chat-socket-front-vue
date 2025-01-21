@@ -7,7 +7,6 @@ interface IDataMessage {
   nickname: string;
   id: string;
 }
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_ULR;
 const socket = io(BACKEND_URL);
 
