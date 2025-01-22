@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import io from "socket.io-client";
-import { ref,watch } from "vue";
+import { onUpdated, ref,watch, watchEffect } from "vue";
 import { convertDateToString } from './utils/utils';
 
 interface IDataMessage {
@@ -27,12 +27,7 @@ socket.on("message", (data) => {
 
   userId.value = socket.id!;
   messages.value.push(data);
-  if (containerMsgRef.value) {
-    const positionY = containerMsgRef.value?.scrollHeight;
-    setTimeout(() => {
-      containerMsgRef.value?.scrollTo({ top: positionY, behavior: "smooth" });
-    }, 300);
-  }
+
 });
 
 
@@ -55,6 +50,22 @@ watch(nickname, (newVal) => {
 watch(color, (newVal) => {
   localStorage.setItem("color", newVal);
 });
+
+onUpdated(()=>{
+
+ handleScroll();
+})
+
+
+
+const handleScroll = ()=>{
+  if (containerMsgRef.value) {
+    const positionY = containerMsgRef.value?.scrollHeight;
+    setTimeout(() => {
+      containerMsgRef.value?.scrollTo({ top: positionY, behavior: "smooth" });
+    }, 300);
+  }
+}
 
 
 </script>
