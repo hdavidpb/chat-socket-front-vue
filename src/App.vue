@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import io from "socket.io-client";
 import { ref,watch } from "vue";
+import { convertDateToString } from './utils/utils';
 
 interface IDataMessage {
   message: string;
   nickname: string;
   color?:string;
   id: string;
+  createdAt:Date;
 }
 const BACKEND_URL = import.meta.env.VITE_BACKEND_ULR;
 const socket = io(BACKEND_URL);
@@ -41,7 +43,9 @@ const handleEmit = () => {
     message: messageEmit.value,
     nickname: nickname.value,
     color: color.value,
+    createdAt: new Date().toISOString(),
     id: socket.id,
+
   });
   messageEmit.value = "";
 };
@@ -62,15 +66,16 @@ watch(color, (newVal) => {
     >
       <section
         ref="containerMsgRef"
-        class="w-full flex-1 bg-blue-200 flex flex-col justify-start items-start p-3 overflow-y-auto gap-3"
+        class="w-full flex-1 bg-hero-pattern flex flex-col justify-start items-start p-3 overflow-y-auto gap-3"
       >
         <div
-          :class="['flex flex-col', { 'self-end': nickname.toLowerCase() === data.nickname.toLowerCase() }]"
+          :class="['flex flex-col bg-[#fcfcfce5] px-2 rounded-lg w-full', { 'self-end': nickname.toLowerCase() === data.nickname.toLowerCase() }]"
           v-for="data in messages"
           :key="data.message"
         >
           <span :style="`color: ${data.color ?? '#000000'}`" :class="['text-lg font-semibold',{'text-right':nickname.toLowerCase() === data.nickname.toLowerCase()}]">{{ data.nickname }}</span>
-          <span class="p-3 bg-white rounded-lg">{{ data.message }}</span>
+          <span :class="['p-2 bg-white rounded-lg text-sm shadow w-auto',{'self-end':nickname.toLowerCase() === data.nickname.toLowerCase()}]">{{ data.message }}</span>
+          <span :class="['text-xs mt-1',{'text-right':nickname.toLowerCase() === data.nickname.toLowerCase()}]">{{ convertDateToString(new Date(data.createdAt)) }}</span>
         </div>
       </section>
      <div class="w-full flex justify-start items-center gap-2 p-2">
